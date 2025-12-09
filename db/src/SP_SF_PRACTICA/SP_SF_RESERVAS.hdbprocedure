@@ -1,0 +1,24 @@
+PROCEDURE "SP_SF_RESERVAS"(
+    OUT RESULT TABLE (
+        CARRID      NVARCHAR(3),
+        CONNID      NVARCHAR(4),
+        FLDATE      DATE,
+        PRICE       DECIMAL(15,2)  
+    )
+ )
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+   --DEFAULT SCHEMA <default_schema_name>
+   READS SQL DATA 
+AS
+BEGIN
+
+    RESULT =
+        SELECT 
+               CARRID,
+               CONNID,
+               FLDATE,
+               PRICE 
+        FROM "SFLIGHT";
+       
+END

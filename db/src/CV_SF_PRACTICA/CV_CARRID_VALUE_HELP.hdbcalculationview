@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="CV_CARRID_VALUE_HELP" applyPrivilegeType="NONE" dataCategory="DIMENSION" dimensionType="STANDARD" schemaVersion="3.0" hierarchyGeneration="SQL" outputViewType="Projection" application="BAS" cacheInvalidationPeriod="NONE" enforceSqlExecution="true" mdsCubeConversionExecution="AT_LOADING_TIME">
+<descriptions defaultDescription="CV_CARRID_VALUE_HELP"/>
+<localVariables/>
+<variableMappings/>
+<dataSources>
+  <DataSource id="SCARR">
+    <resourceUri>SCARR</resourceUri>
+  </DataSource>
+</dataSources>
+<snapshotProcedures/>
+<calculationViews>
+  <calculationView xsi:type="Calculation:ProjectionView" id="P_SCARR">
+    <viewAttributes>
+      <viewAttribute id="MANDT"/>
+      <viewAttribute id="CARRID"/>
+      <viewAttribute id="CARRNAME"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="SCARR"/>
+  </calculationView>
+  <calculationView xsi:type="Calculation:UnionView" id="U_SCARR">
+    <viewAttributes>
+      <viewAttribute id="MANDT"/>
+      <viewAttribute id="CARRID"/>
+      <viewAttribute id="CARRNAME"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="P_SCARR">
+      <mapping xsi:type="Calculation:AttributeMapping" target="MANDT" source="MANDT"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="CARRID" source="CARRID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="CARRNAME" source="CARRNAME"/>
+    </input>
+  </calculationView>
+</calculationViews>
+<logicalModel id="U_SCARR">
+  <attributes>
+    <attribute id="MANDT" order="1" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="MANDT"/>
+      <keyMapping columnObjectName="U_SCARR" columnName="MANDT"/>
+    </attribute>
+    <attribute id="CARRID" order="2" descriptionColumnName="CARRNAME" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="CARRID"/>
+      <keyMapping columnObjectName="U_SCARR" columnName="CARRID"/>
+    </attribute>
+    <attribute id="CARRNAME" order="3" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="CARRNAME"/>
+      <keyMapping columnObjectName="U_SCARR" columnName="CARRNAME"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures/>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+  
+    <shape expanded="true" modelObjectName="P_SCARR" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="116" y="308"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape expanded="true" modelObjectName="U_SCARR" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="116" y="197"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>
