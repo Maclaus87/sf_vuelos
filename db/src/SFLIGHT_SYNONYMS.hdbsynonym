@@ -83,6 +83,12 @@
       "schema": "SFLIGHT"
     }
   },
+  "T_DATA_INTEGRATION_LOG": {
+    "target": {
+      "object": "T_DATA_INTEGRATION_LOG",
+      "schema": "SFLIGHT"
+    }
+  },
   "SCARR": {
     "target": {
       "object": "SCARR",
