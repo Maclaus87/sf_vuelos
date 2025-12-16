@@ -1,0 +1,150 @@
+PROCEDURE "SP_VL_RESERVAS" (
+    IN p_year  INTEGER,
+    IN p_month INTEGER
+)
+LANGUAGE SQLSCRIPT
+SQL SECURITY INVOKER
+AS
+BEGIN
+
+    ------------------------------------------------------------------
+    -- VARIABLES
+    ------------------------------------------------------------------
+    DECLARE lv_mes_objetivo   INTEGER;
+    DECLARE job_start_time    SECONDDATE;
+    DECLARE job_end_time      SECONDDATE;
+    DECLARE records_count     INTEGER;
+    DECLARE app_user          NVARCHAR(200);
+
+    ------------------------------------------------------------------
+    -- MANEJO DE ERRORES
+    ------------------------------------------------------------------
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        INSERT INTO "T_DATA_S_INTEGRATION_LOG" (
+            "JOB_NAME",
+            "JOB_START_TIME",
+            "JOB_FINISH_TIME",
+            "JOB_FREQUENCY",
+            "SOURCE_DATASET",
+            "TARGET_DATASET",
+            "RECORDS_WRITTEN",
+            "APPLICATION_USER",
+            "JOB_STATUS",
+            "JOB_ERROR_CODE",
+            "JOB_ERROR_MESSAGE",
+            "FUENTE",
+            "DESCRIPCION_FUNCIONAL",
+            "CAMPO_FECHA",
+            "FRECUENCIA_ACTUALIZACION"
+        )
+        VALUES (
+            'SP_VL_RESERVAS',
+            :job_start_time,
+            NULL,
+            NULL,
+            'SFLIGHT',
+            'SFLIGHT_LOG',
+            0,
+            SESSION_CONTEXT('APPLICATIONUSER'),
+            'FAILURE',
+            ::SQL_ERROR_CODE,
+            ::SQL_ERROR_MESSAGE,
+            'SFLIGHT',
+            'Carga mensual vuelos (demo)',
+            'FLDATE',
+            'MENSUAL'
+        );
+    END;
+
+    ------------------------------------------------------------------
+    -- INICIO DEL PROCESO
+    ------------------------------------------------------------------
+    job_start_time := CAST(CURRENT_UTCTIMESTAMP AS SECONDDATE);
+    app_user       := SESSION_CONTEXT('APPLICATIONUSER');
+
+    lv_mes_objetivo := :p_year * 100 + :p_month;
+
+    ------------------------------------------------------------------
+    -- VALIDAR REGISTROS
+    ------------------------------------------------------------------
+    SELECT COUNT(*)
+      INTO records_count
+      FROM "SFLIGHT"
+     WHERE YEAR("FLDATE")  = :p_year
+       AND MONTH("FLDATE") = :p_month;
+
+    ------------------------------------------------------------------
+    -- BORRADO DEL MES EN DESTINO
+    ------------------------------------------------------------------
+    DELETE FROM "SFLIGHT_LOG"
+     WHERE YEAR("FLDATE")  = :p_year
+       AND MONTH("FLDATE") = :p_month;
+
+    ------------------------------------------------------------------
+    -- INSERCIÓN DE DATOS
+    ------------------------------------------------------------------
+    INSERT INTO "SFLIGHT_LOG" (
+        "CARRID",
+        "CONNID",
+        "FLDATE",
+        "PRICE",
+        "CURRENCY",
+        "SEATSMAX",
+        "SEATSOCC",
+        "FECHA_CARGA"
+    )
+    SELECT
+        "CARRID",
+        "CONNID",
+        "FLDATE",
+        "PRICE",
+        "CURRENCY",
+        "SEATSMAX",
+        "SEATSOCC",
+        CURRENT_DATE
+    FROM "SFLIGHT"
+    WHERE YEAR("FLDATE")  = :p_year
+      AND MONTH("FLDATE") = :p_month;
+
+    COMMIT;
+
+    ------------------------------------------------------------------
+    -- FIN DEL PROCESO
+    ------------------------------------------------------------------
+    job_end_time := CAST(CURRENT_UTCTIMESTAMP AS SECONDDATE);
+
+    INSERT INTO "T_DATA_S_INTEGRATION_LOG" (
+        "JOB_NAME",
+        "JOB_START_TIME",
+        "JOB_FINISH_TIME",
+        "JOB_FREQUENCY",
+        "SOURCE_DATASET",
+        "TARGET_DATASET",
+        "RECORDS_WRITTEN",
+        "APPLICATION_USER",
+        "JOB_STATUS",
+        "FUENTE",
+        "DESCRIPCION_FUNCIONAL",
+        "CAMPO_FECHA",
+        "FRECUENCIA_ACTUALIZACION"
+    )
+    VALUES (
+        'SP_VL_RESERVAS',
+        :job_start_time,
+        :job_end_time,
+        NULL,
+        'SFLIGHT',
+        'SFLIGHT_LOG',
+        :records_count,
+        :app_user,
+        'SUCCESS',
+        'SFLIGHT',
+        'Carga mensual vuelos (demo)',
+        'FLDATE',
+        'MENSUAL'
+    );
+
+    COMMIT;
+
+END;

@@ -1,0 +1,31 @@
+PROCEDURE "SP_SF_CONSULTA_AE" (
+    IN  p_carrid NVARCHAR(3),
+    OUT RESULT TABLE (
+        CARRID     NVARCHAR(3),
+        CONNID     INTEGER,
+        FLDATE     DATE,
+        PRICE      DECIMAL(15,2),
+        CURRENCY   NVARCHAR(5),
+        SEATSMAX   INTEGER,
+        SEATSOCC   INTEGER
+    )
+)
+LANGUAGE SQLSCRIPT
+SQL SECURITY INVOKER
+READS SQL DATA
+AS
+BEGIN
+
+    RESULT =
+        SELECT
+            "CARRID",
+            "CONNID",
+            "FLDATE",
+            "PRICE",
+            "CURRENCY",
+            "SEATSMAX",
+            "SEATSOCC"
+        FROM "SFLIGHT"
+        WHERE "CARRID" = :p_carrid;
+
+END;
