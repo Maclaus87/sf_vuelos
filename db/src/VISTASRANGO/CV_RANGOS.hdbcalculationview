@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="CV_RANGOS" applyPrivilegeType="NONE" dataCategory="CUBE" schemaVersion="3.0" hierarchyGeneration="SQL" outputViewType="Aggregation" application="BAS" cacheInvalidationPeriod="NONE" enforceSqlExecution="true" mdsCubeConversionExecution="AT_LOADING_TIME">
+<descriptions defaultDescription="CV_RANGOS"/>
+<localVariables/>
+<variableMappings/>
+<dataSources>
+  <DataSource id="SAGENCYDATA">
+    <resourceUri>SAGENCYDATA</resourceUri>
+  </DataSource>
+  <DataSource id="STRAVELAG">
+    <resourceUri>STRAVELAG</resourceUri>
+  </DataSource>
+</dataSources>
+<snapshotProcedures/>
+<calculationViews>
+  <calculationView xsi:type="Calculation:JoinView" id="J_SAGEN_STRAVE" cardinality="CN_N" joinType="inner">
+    <viewAttributes>
+      <viewAttribute id="AGENCYNUM"/>
+      <viewAttribute id="NUMBOOKINGS" aggregationType="sum"/>
+      <viewAttribute id="STREET"/>
+      <viewAttribute id="NAME"/>
+      <viewAttribute hidden="true" id="JOIN$AGENCYNUM$AGENCYNUM"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="SAGENCYDATA">
+      <mapping xsi:type="Calculation:AttributeMapping" target="AGENCYNUM" source="AGENCYNUM"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="NUMBOOKINGS" source="NUMBOOKINGS"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$AGENCYNUM$AGENCYNUM" source="AGENCYNUM"/>
+    </input>
+    <input node="STRAVELAG">
+      <mapping xsi:type="Calculation:AttributeMapping" target="STREET" source="STREET"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="NAME" source="NAME"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$AGENCYNUM$AGENCYNUM" source="AGENCYNUM"/>
+    </input>
+    <joinAttribute name="JOIN$AGENCYNUM$AGENCYNUM"/>
+  </calculationView>
+  <calculationView xsi:type="Calculation:RankView" id="Rank_1">
+    <viewAttributes>
+      <viewAttribute id="AGENCYNUM"/>
+      <viewAttribute id="NUMBOOKINGS" aggregationType="sum"/>
+      <viewAttribute id="STREET"/>
+    
+      <viewAttribute id="NAME"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="J_SAGEN_STRAVE"/>
+    <rankingFilter type="RANK" offset="0" offsetReference="FRONT" dynamicPartitionAttributes="false">
+      <order byViewAttributeName="NUMBOOKINGS" direction="DESC"/>
+      <rankThreshold>
+        <value>5</value>
+      </rankThreshold>
+    </rankingFilter>
+  </calculationView>
+</calculationViews>
+<logicalModel id="Rank_1">
+  <attributes>
+    <attribute id="N_AGENCIAS" order="1" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="AGENCYNUM"/>
+      <keyMapping columnObjectName="Rank_1" columnName="AGENCYNUM"/>
+    </attribute>
+    <attribute id="CALLE" order="3" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="STREET"/>
+      <keyMapping columnObjectName="Rank_1" columnName="STREET"/>
+    </attribute>
+    <attribute id="NOMBRE" order="4" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="NAME"/>
+      <keyMapping columnObjectName="Rank_1" columnName="NAME"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures>
+    <measure id="N_RESERVAS" order="2" aggregationType="sum" measureType="simple">
+      <descriptions defaultDescription="NUMBOOKINGS"/>
+      <measureMapping columnObjectName="Rank_1" columnName="NUMBOOKINGS"/>
+      <exceptionAggregationMetadata/>
+    </measure>
+  </baseMeasures>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+  <localDimensions/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+  
+    <shape expanded="true" modelObjectName="J_SAGEN_STRAVE" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="80" y="330"/>
+      <rectangleSize height="30" width="200"/>
+    </shape>
+    <shape modelObjectName="SAGENCYDATA" modelObjectNameSpace="J_SAGEN_STRAVE" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="20" y="30"/>
+      <rectangleSize width="189"/>
+    </shape>
+    <shape modelObjectName="STRAVELAG" modelObjectNameSpace="J_SAGEN_STRAVE" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="320" y="30"/>
+      <rectangleSize width="177"/>
+    </shape>
+    <shape expanded="true" modelObjectName="Rank_1" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="100" y="230"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>
