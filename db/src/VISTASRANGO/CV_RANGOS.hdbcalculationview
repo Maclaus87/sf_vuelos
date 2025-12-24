@@ -10,6 +10,9 @@
   <DataSource id="STRAVELAG">
     <resourceUri>STRAVELAG</resourceUri>
   </DataSource>
+  <DataSource id="SBOOK">
+    <resourceUri>SBOOK</resourceUri>
+  </DataSource>
 </dataSources>
 <snapshotProcedures/>
 <calculationViews>
@@ -51,27 +54,72 @@
       </rankThreshold>
     </rankingFilter>
   </calculationView>
+  <calculationView xsi:type="Calculation:JoinView" id="Join_1" cardinality="C1_N" joinType="inner">
+    <viewAttributes>
+      <viewAttribute id="AGENCYNUM"/>
+      <viewAttribute id="NUMBOOKINGS" aggregationType="sum"/>
+      <viewAttribute id="STREET"/>
+      <viewAttribute id="NAME"/>
+      <viewAttribute id="ORDER_DATE"/>
+      <viewAttribute hidden="true" id="JOIN$AGENCYNUM$AGENCYNUM"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="Rank_1">
+      <mapping xsi:type="Calculation:AttributeMapping" target="AGENCYNUM" source="AGENCYNUM"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="NUMBOOKINGS" source="NUMBOOKINGS"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="STREET" source="STREET"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="NAME" source="NAME"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$AGENCYNUM$AGENCYNUM" source="AGENCYNUM"/>
+    </input>
+    <input node="SBOOK">
+      <mapping xsi:type="Calculation:AttributeMapping" target="ORDER_DATE" source="ORDER_DATE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$AGENCYNUM$AGENCYNUM" source="AGENCYNUM"/>
+    </input>
+    <joinAttribute name="JOIN$AGENCYNUM$AGENCYNUM"/>
+  </calculationView>
+  <calculationView xsi:type="Calculation:RankView" id="Rank_2">
+    <viewAttributes>
+      <viewAttribute id="AGENCYNUM"/>
+      <viewAttribute id="NUMBOOKINGS" aggregationType="sum"/>
+      <viewAttribute id="STREET"/>
+      <viewAttribute id="NAME"/>
+      <viewAttribute id="ORDER_DATE"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="Join_1"/>
+    <rankingFilter type="RANK" offset="0" offsetReference="FRONT" dynamicPartitionAttributes="false">
+      <partitionViewAttributeName id="AGENCYNUM"/>
+      <order byViewAttributeName="ORDER_DATE" direction="DESC"/>
+      <rankThreshold>
+        <value>1</value>
+      </rankThreshold>
+    </rankingFilter>
+  </calculationView>
 </calculationViews>
-<logicalModel id="Rank_1">
+<logicalModel id="Rank_2">
   <attributes>
-    <attribute id="N_AGENCIAS" order="1" displayAttribute="false" attributeHierarchyActive="false">
+    <attribute id="AGENCYNUM" order="1" displayAttribute="false" attributeHierarchyActive="false">
       <descriptions defaultDescription="AGENCYNUM"/>
-      <keyMapping columnObjectName="Rank_1" columnName="AGENCYNUM"/>
+      <keyMapping columnObjectName="Rank_2" columnName="AGENCYNUM"/>
     </attribute>
-    <attribute id="CALLE" order="3" displayAttribute="false" attributeHierarchyActive="false">
+    <attribute id="STREET" order="3" displayAttribute="false" attributeHierarchyActive="false">
       <descriptions defaultDescription="STREET"/>
-      <keyMapping columnObjectName="Rank_1" columnName="STREET"/>
+      <keyMapping columnObjectName="Rank_2" columnName="STREET"/>
     </attribute>
-    <attribute id="NOMBRE" order="4" displayAttribute="false" attributeHierarchyActive="false">
+    <attribute id="NAME" order="4" displayAttribute="false" attributeHierarchyActive="false">
       <descriptions defaultDescription="NAME"/>
-      <keyMapping columnObjectName="Rank_1" columnName="NAME"/>
+      <keyMapping columnObjectName="Rank_2" columnName="NAME"/>
+    </attribute>
+    <attribute id="ORDER_DATE" order="5" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="ORDER_DATE"/>
+      <keyMapping columnObjectName="Rank_2" columnName="ORDER_DATE"/>
     </attribute>
   </attributes>
   <calculatedAttributes/>
   <baseMeasures>
-    <measure id="N_RESERVAS" order="2" aggregationType="sum" measureType="simple">
+    <measure id="NUMBOOKINGS" order="2" aggregationType="sum" measureType="simple">
       <descriptions defaultDescription="NUMBOOKINGS"/>
-      <measureMapping columnObjectName="Rank_1" columnName="NUMBOOKINGS"/>
+      <measureMapping columnObjectName="Rank_2" columnName="NUMBOOKINGS"/>
       <exceptionAggregationMetadata/>
     </measure>
   </baseMeasures>
@@ -82,11 +130,13 @@
 <layout>
   <shapes>
     <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
-      <upperLeftCorner x="40" y="85"/>
+      <upperLeftCorner x="301" y="149"/>
+    
+      <rectangleSize width="160"/>
     </shape>
   
     <shape expanded="true" modelObjectName="J_SAGEN_STRAVE" modelObjectNameSpace="CalculationView">
-      <upperLeftCorner x="80" y="330"/>
+      <upperLeftCorner x="158" y="619"/>
       <rectangleSize height="30" width="200"/>
     </shape>
     <shape modelObjectName="SAGENCYDATA" modelObjectNameSpace="J_SAGEN_STRAVE" modelObjectType="JoinNodeInput">
@@ -97,10 +147,28 @@
       <upperLeftCorner x="320" y="30"/>
       <rectangleSize width="177"/>
     </shape>
-    <shape expanded="true" modelObjectName="Rank_1" modelObjectNameSpace="CalculationView">
-      <upperLeftCorner x="100" y="230"/>
+    <shape expanded="true" modelObjectName="Rank_2" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="269" y="218"/>
       <rectangleSize height="30" width="160"/>
     </shape>
-  </shapes>
+  
+    <shape expanded="true" modelObjectName="Rank_1" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="198" y="491"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+  
+    <shape expanded="true" modelObjectName="Join_1" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="269" y="304"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+  
+    <shape modelObjectName="Rank_1" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="20" y="30"/>
+      <rectangleSize width="250"/>
+    </shape>
+    <shape modelObjectName="SBOOK" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="320" y="30"/>
+      <rectangleSize width="181"/>
+    </shape></shapes>
 </layout>
 </Calculation:scenario>
