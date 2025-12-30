@@ -1,0 +1,24 @@
+PROCEDURE "SP_CARGA_SFLIGHT_JOB" ()
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+AS
+BEGIN
+   -- 1. Limpiamos datos previos para que la tabla no crezca infinitamente
+   DELETE FROM "T_SFLIGHT_CONSOLIDADO"; 
+
+   -- 2. Insertamos la lógica de SFLIGHT
+   INSERT INTO "T_SFLIGHT_CONSOLIDADO" (
+       "CARRID", 
+       "CONNID", 
+       "FLDATE", 
+       "PRICE", 
+       "FECHA_PROCESO"
+   )
+   SELECT 
+          "CARRID",
+          "CONNID",
+          "FLDATE",
+          "PRICE",
+          CURRENT_UTCTIMESTAMP 
+   FROM "SFLIGHT";
+END;

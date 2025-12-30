@@ -1,0 +1,4 @@
+SCHEDULER JOB "carga_vuelos"
+CRON '* * * * 2 0 0' 
+ENABLE 
+PROCEDURE "SP_CARGA_SFLIGHT_JOB"
