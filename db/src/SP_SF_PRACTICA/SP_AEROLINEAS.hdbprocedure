@@ -1,0 +1,30 @@
+PROCEDURE "SP_AEROLINEAS"(
+    IN i_carrid NVARCHAR(3),
+    OUT o_result TABLE(
+        carrid NVARCHAR(3),
+         carrname NVARCHAR(20),
+        connid   NVARCHAR(4),
+        fldate   DATE,
+        price    DECIMAL(15,2),
+        currency NVARCHAR(5)
+    )
+)
+LANGUAGE SQLSCRIPT
+SQL SECURITY INVOKER
+AS
+BEGIN
+  
+   o_result =
+        SELECT 
+            f.carrid,
+            c.carrname,
+            f.connid,
+            f.fldate,
+            f.price,
+            f.currency
+        FROM SFLIGHT AS f
+        INNER JOIN SCARR AS c
+            ON f.carrid = c.carrid
+        WHERE f.carrid = :i_carrid;
+
+END;

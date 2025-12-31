@@ -1,0 +1,26 @@
+PROCEDURE "SP_VUELOS_POR_AEROLINEA"(
+      IN i_carrid NVARCHAR(3),
+      OUT o_result TABLE (
+        carrid NVARCHAR(3),
+        connid NVARCHAR(4),
+        fldate DATE,
+        price DECIMAL(15,2),
+        currency NVARCHAR(5)
+      )     
+
+)
+LANGUAGE SQLSCRIPT
+SQL SECURITY INVOKER
+AS
+BEGIN
+
+    o_result =
+        SELECT
+            carrid,
+            connid,
+            fldate,
+            price,
+            currency
+        FROM SFLIGHT 
+        WHERE carrid = :i_carrid;
+END;          
